@@ -27,12 +27,9 @@ class Client(object):
         '''
         Distributed program
         '''
-        result = ""
-        
         for i in range(segment.START, segment.STOP):
-            if i == 5555:
-                result += "Found hash with i = " + str(i)
-        return result
+            if i%1000 == segment.HASH:
+                segment.RESULT = str(i)
         
     def run(self):
         while True:
@@ -50,16 +47,16 @@ class Client(object):
             
             if segmentToCompute.START != segmentToCompute.STOP:
                 print("[x] Calculating:")
-                calculResult = self.calcul(segmentToCompute)
+                self.calcul(segmentToCompute)
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.connect((self.HOST, self.PORT))
                 print("[x] Sending result and closing connection")
                 s.send(b"Result")
-                s.send(bytearray(calculResult, encoding='ascii'))
+                s.send(pickle.dumps(segmentToCompute))
                 s.close()
                 print("[x] Ended")
             else:
-                print ("[x] End of segmentation reached, STOP")
+                print("[x] End of segmentation reached, STOP")
                 break
 
 if __name__ == "__main__":
